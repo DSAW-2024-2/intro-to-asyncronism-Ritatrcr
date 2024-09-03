@@ -1,134 +1,217 @@
+const pokemonList = document.querySelector("#listPokemon");
+const headerButtons = document.querySelectorAll(".btn");
+const prevBtn = document.querySelector("#prev-btn");
+const nextBtn = document.querySelector("#next-btn");
+const searchInput = document.querySelector("#pokemon-search");
+const searchBtn = document.querySelector("#search-btn");
+const randomBtn = document.querySelector("#random-btn");
+const pokemonModal = document.querySelector("#pokemon-modal");
+const modalContent = document.querySelector("#modal-pokemon-details");
+const closeModal = document.querySelector("#close-modal");
+const BASE_URL = "https://pokeapi.co/api/v2/pokemon/";
+const POKEMON_PER_PAGE = 21;
+let currentPage = 1;
+let currentType = "all";
 
+async function fetchPokemon(id) {
+    const response = await fetch(`${BASE_URL}${id}`);
+    const data = await response.json();
+    return data;
+}
 
-// Mapeo de colores pastel según el tipo de Pokémon
-const typeColors = {
-    normal: '#D3D3D3',
-    fire: '#FFD1BA',
-    water: '#B3D9FF',
-    electric: '#FFFACD',
-    grass: '#C1E1C1',
-    ice: '#D0E8E8',
-    fighting: '#E6A8A8',
-    poison: '#E6CCE6',
-    ground: '#EEDD82',
-    flying: '#DDEDFB',
-    psychic: '#FFB6C1',
-    bug: '#D6E8D6',
-    rock: '#E3E2C3',
-    ghost: '#C6BBDA',
-    dragon: '#C2C2FF',
-    dark: '#A9A9A9',
-    steel: '#D4D4D4',
-    fairy: '#FADADD'
-};
+async function fetchPokemonsByType(type, offset = 0) {
+    const response = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
+    const data = await response.json();
+    const pokemons = data.pokemon.slice(offset, offset + POKEMON_PER_PAGE);
+    return Promise.all(pokemons.map(poke => fetchPokemon(poke.pokemon.name)));
+}
 
-// Función para buscar un Pokémon específico
-async function fetchPokemonData() {
-    const input = document.getElementById('pokemonInput').value.toLowerCase();
-    if (!input) return;  // No hacer nada si el input está vacío
+async function fetchAllPokemons(offset = 0) {
+    const allPokemons = [];
+    for (let i = offset + 1; i <= offset + POKEMON_PER_PAGE; i++) {
+        try {
+            const pokemon = await fetchPokemon(i);
+            allPokemons.push(pokemon);
+        } catch (error) {
+            break;
+        }
+    }
+    return allPokemons;
+}
 
-    const pokemonCardsDiv = document.getElementById('pokemonCards');
-    const currentPokemonDiv = document.getElementById('currentPokemon');
-
+async function getTotalPokemonCount() {
     try {
-        // Llamada al primer endpoint: Obtener datos básicos del Pokémon
-        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${input}`);
-        if (!response.ok) {
-            throw new Error('Pokémon not found');
-        }
+        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1');
         const data = await response.json();
-
-        // Llamada al segundo endpoint: Obtener especies para información adicional
-        const speciesResponse = await fetch(data.species.url);
-        const speciesData = await speciesResponse.json();
-
-        // Llamada al tercer endpoint: Obtener la cadena evolutiva
-        const evolutionResponse = await fetch(speciesData.evolution_chain.url);
-        const evolutionData = await evolutionResponse.json();
-
-        // Si ya hay un Pokémon en el área actual, moverlo a la lista de buscados
-        if (currentPokemonDiv.innerHTML !== '') {
-            const previousPokemonCard = document.createElement('div');
-            previousPokemonCard.className = 'pokemon-card';
-            previousPokemonCard.innerHTML = currentPokemonDiv.innerHTML;
-
-            // Obtener el tipo del Pokémon que se está moviendo a la lista
-            const previousPokemonType = currentPokemonDiv.getAttribute('data-pokemon-type');
-            previousPokemonCard.style.backgroundColor = getTypeColor(previousPokemonType);
-
-            // Insertar en la parte superior de la lista
-            pokemonCardsDiv.insertBefore(previousPokemonCard, pokemonCardsDiv.firstChild);
-        }
-
-        // Mostrar el nuevo Pokémon buscado en el área especial
-        currentPokemonDiv.innerHTML = `
-            <img src="${data.sprites.front_default}" alt="${data.name}">
-            <h2>${data.name}</h2>
-            <p>Weight: ${data.weight} hectograms</p>
-            <p>Base Experience: ${data.base_experience}</p>
-            <p>Species: ${speciesData.name}</p>
-            <p>Evolution Chain: ${getEvolutionChain(evolutionData.chain)}</p>
-        `;
-        const pokemonType = data.types[0].type.name;
-        currentPokemonDiv.style.backgroundColor = getTypeColor(pokemonType);
-        currentPokemonDiv.setAttribute('data-pokemon-type', pokemonType); // Guardar el tipo del Pokémon actual
-
+        return data.count; 
     } catch (error) {
-        showAlert(error.message);
+        console.error('Error fetching Pokémon count:', error);
+        return 20; 
     }
 }
 
-// Función para obtener un Pokémon aleatorio por nombre
 async function fetchRandomPokemon() {
     try {
-        // Obtener una lista de todos los Pokémon
-        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=898');
-        const data = await response.json();
-        const randomPokemon = data.results[Math.floor(Math.random() * data.results.length)];
-        
-        // Realizar la búsqueda por nombre
-        const pokemonInput = document.getElementById('pokemonInput');
-        pokemonInput.value = randomPokemon.name;
-        fetchPokemonData();
+        const totalPokemonCount = await getTotalPokemonCount();
+        const randomId = Math.floor(Math.random() * totalPokemonCount) + 1; 
+        return fetchPokemon(randomId);
     } catch (error) {
-        showAlert('Failed to fetch a random Pokémon');
+        console.error('Error fetching random Pokémon:', error);
     }
 }
 
-// Función para recorrer la cadena evolutiva
-function getEvolutionChain(chain) {
-    let evolutionChain = chain.species.name;
-    while (chain.evolves_to.length) {
-        chain = chain.evolves_to[0];
-        evolutionChain += ` -> ${chain.species.name}`;
+
+function displayPokemon(poke) {
+    let types = poke.types.map(type => `<p class="${type.type.name} type">${type.type.name}</p>`).join('');
+    let pokeId = poke.id.toString().padStart(3, '0');
+    let primaryType = poke.types[0].type.name;
+
+    const div = document.createElement("div");
+    div.classList.add("pokemon");
+    div.style.background = `linear-gradient(135deg, var(--type-${primaryType}) 5%, rgba(255, 255, 255, 0.1) 200%)`;
+    div.dataset.pokemonId = poke.id;
+
+    div.innerHTML = `
+        <p class="pokemon-id-back">#${pokeId}</p>
+        <div class="pokemon-image">
+            <img src="${poke.sprites.other["official-artwork"].front_default}" alt="${poke.name}">
+        </div>
+        <div class="pokemon-info">
+            <div class="name-container">
+                <h2 class="pokemon-name">${poke.name}</h2>
+            </div>
+            <div class="pokemon-types">
+                ${types}
+            </div>
+            <div class="pokemon-stats">
+                <p class="stat">Height: ${poke.height/10}m</p>
+                <p class="stat">Weight: ${poke.weight/10}kg</p>
+            </div>
+        </div>
+    `;
+    pokemonList.append(div);
+
+
+    div.addEventListener("click", async () => {
+        const pokemonDetails = await fetchPokemon(poke.id);
+        showModal(pokemonDetails);
+    });
+}
+
+function showModal(pokemon) {
+    const types = pokemon.types.map(type => `<p class="modal-type ${type.type.name}">${type.type.name}</p>`).join('');
+    const pokeId = pokemon.id.toString().padStart(3, '0');
+
+    modalContent.innerHTML = `
+        <h2>${pokemon.name} (#${pokeId})</h2>
+        <div class="modal-image">
+            <img src="${pokemon.sprites.other["official-artwork"].front_default}" alt="${pokemon.name}">
+        </div>
+        <div class="modal-info">
+            <p>Height: ${pokemon.height / 10} m</p>
+            <p>Weight: ${pokemon.weight / 10} kg</p>
+            <p>Types: ${types}</p>
+        </div>
+    `;
+    pokemonModal.style.display = "block";
+}
+
+function closeModalWindow() {
+    pokemonModal.style.display = "none";
+}
+
+async function loadPokemons(type = "all", page = 1) {
+    pokemonList.innerHTML = ''; 
+    currentPage = page;
+    currentType = type;
+    
+    let offset = (page - 1) * POKEMON_PER_PAGE;
+    let pokemons;
+
+    if (type === "all") {
+        pokemons = await fetchAllPokemons(offset);
+    } else {
+        pokemons = await fetchPokemonsByType(type, offset);
     }
-    return evolutionChain;
+    pokemons.forEach(displayPokemon);
 }
 
-// Función para mostrar un aviso de error
-function showAlert(message) {
-    const alertDiv = document.getElementById('alert');
-    alertDiv.textContent = message;
-    alertDiv.classList.add('show');
-    setTimeout(() => {
-        alertDiv.classList.remove('show');
-    }, 3000);
+async function searchPokemon(name) {
+    pokemonList.innerHTML = ''; 
+    try {
+        const pokemon = await fetchPokemon(name.toLowerCase());
+        displayPokemon(pokemon);
+    } catch (error) {
+        pokemonList.innerHTML = `<p>Pokémon not found.</p>`;
+    }
 }
 
-// Función para obtener el color basado en el tipo de Pokémon
-function getTypeColor(type) {
-    return typeColors[type] || '#f9f9f9';  // Color por defecto si el tipo no está en la lista
+function setupButtons() {
+    prevBtn.addEventListener("click", () => {
+        if (currentPage > 1) {
+            loadPokemons(currentType, currentPage - 1);
+        }
+    });
+
+    nextBtn.addEventListener("click", async () => {
+        const offset = currentPage * POKEMON_PER_PAGE;
+        let hasMorePokemons = true;
+
+        if (currentType === "all") {
+            try {
+                await fetchPokemon(offset + 1); 
+            } catch {
+                hasMorePokemons = false; 
+            }
+        } else {
+            const pokemons = await fetchPokemonsByType(currentType, offset);
+            hasMorePokemons = pokemons.length > 0;
+        }
+        
+        if (hasMorePokemons) {
+            loadPokemons(currentType, currentPage + 1);
+        }
+    });
+
+    headerButtons.forEach(button => {
+        button.addEventListener("click", (e) => {
+            const type = e.target.id;
+            if (type === "see-all") {
+                loadPokemons("all");
+            } else if (type) {
+                loadPokemons(type);
+            }
+        });
+    });
+
+    searchBtn.addEventListener("click", () => {
+        const searchTerm = searchInput.value.trim();
+        if (searchTerm) {
+            searchPokemon(searchTerm);
+        }
+    });
+
+    searchInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            searchBtn.click();
+        }
+    });
+
+    randomBtn.addEventListener("click", async () => {
+        const pokemon = await fetchRandomPokemon();
+        pokemonList.innerHTML = ''; 
+        displayPokemon(pokemon);
+    });
+
+
+    closeModal.addEventListener("click", closeModalWindow);
+    window.addEventListener("click", (e) => {
+        if (e.target === pokemonModal) {
+            closeModalWindow();
+        }
+    });
 }
 
-// Función para limpiar la lista de Pokémon buscados
-function clearPokemonList() {
-    const pokemonCardsDiv = document.getElementById('pokemonCards');
-    pokemonCardsDiv.innerHTML = '';  // Vaciar el contenedor de tarjetas
-}
 
-
-// Función para limpiar la lista de Pokémon buscados
-function clearPokemonList() {
-    const pokemonCardsDiv = document.getElementById('pokemonCards');
-    pokemonCardsDiv.innerHTML = '';  // Vaciar el contenedor de tarjetas
-}
+setupButtons();
+loadPokemons();

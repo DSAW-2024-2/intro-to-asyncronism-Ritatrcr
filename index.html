@@ -1,51 +1,137 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Pokemon App</title>
+    <link rel="icon" href="ball.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <link rel="stylesheet" href="styles.css">
-
-    <title>Pokemon</title>
-    <link rel="icon" href="img/n.png" type="image/icon type">
-    <!-- minify -->
-    <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
-    <!-- latest -->
-    <link href="https://unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" />
-    <!-- core style only -->
-    <link href="https://unpkg.com/nes.css/css/nes-core.min.css" rel="stylesheet" />
 </head>
-
-
-
 <body>
+    
+    <header>
+        <nav class="title">
+            <img class="title image" src="pokedex.png" alt="Logo Pokédex">
+        </nav>
+    </header>
+    
 
-    <div class="main-container">
 
-        <div class="left-section">
-            <h1>Pokémon Information</h1>
-            <input type="text" id="pokemonInput" placeholder="Enter Pokémon name or ID">
+    <div class="search-container">
+        <input type="text" id="pokemon-search" placeholder="Enter Pokémon name">
+        <button class="btn-search" id="search-btn">
+            <i class="fas fa-search"></i>
+        </button>
+        <button class="btn-search" id="random-btn">
+            <i class="fas fa-random"></i>
+        </button>
+        
+    </div>
+    
+      
+<!--     
+    FALTA
+    1. Filtro busqueda por nombre
+    - limpiar nombre cuando se aplican filtros
+    - ir buscando mientras escribo
+    - pop up cuando no se encuentra  
+    
+    2. Filtro por tipo
+    - Pop Up con info 
+        (id, elemento, foto, peso, altutra, evolucion, estadistica, movimientos, )
+    - Prev y Next (disabilitar)
 
-            <button class="button" onclick="fetchPokemonData()">Search</button>
-            <button class="button random" onclick="fetchRandomPokemon()">Random Pokémon</button>  
-            <div id="currentPokemon" class="current-pokemon">
-        </div>
+    -filtro con peso
+    -Altura
+    
+    -->
+    <div class="line"> </div>
+    
+    <nav class="nav">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <button class=" btn" id="see-all">See All</button>
+            </li> 
+            <li class="nav-item">
+                <button class=" btn normal" id="normal">Normal</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn fire" id="fire">Fire</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn water" id="water">Water</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn grass" id="grass">Grass</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn electric" id="electric">Electric</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn ice" id="ice">Ice</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn fighting" id="fighting">Fighting</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn poison" id="poison">Poison</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn ground" id="ground">Ground</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn flying" id="flying">Flying</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn psychic" id="psychic">Psychic</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn bug" id="bug">Bug</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn rock" id="rock">Rock</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn ghost" id="ghost">Ghost</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn dark" id="dark">Dark</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn dragon" id="dragon">Dragon</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn steel" id="steel">Steel</button>
+            </li>
+            <li class="nav-item">
+                <button class=" btn fairy" id="fairy">Fairy</button>
+            </li>
+        </ul>
+    </nav>
 
-        <div class="right-section">
-            <h2>Searched Pokémon</h2>
-            <div id="pokemonCards" class="pokemon-cards">
-        </div>
-            <div>
-                <button class="button" onclick="clearPokemonList()">Limpiar lista</button>
+    <main>
+        <div id="all">
+            <div class="all-pokemons" id="listPokemon">
+            </div>
+        </div>  
+
+        <div id="pokemon-modal" class="pokemon-modal">
+            <div class="modal-content">
+                <span id="close-modal" class="close">&times;</span>
+                <div id="modal-pokemon-details"></div>
             </div>
         </div>
 
-    </div>
-    <div id="alert" class="alert">
-    </div>
 
+        <div class="pagination">
+            <button id="prev-btn"><i class="fas fa-chevron-left"></i></button>
+            <button id="next-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </main>
 
     <script src="script.js"></script>
-
 </body>
 </html>
