@@ -1,13 +1,16 @@
 const pokemonList = document.querySelector("#listPokemon");
 const headerButtons = document.querySelectorAll(".btn");
+
 const prevBtn = document.querySelector("#prev-btn");
 const nextBtn = document.querySelector("#next-btn");
+
 const searchInput = document.querySelector("#pokemon-search");
 const searchBtn = document.querySelector("#search-btn");
 const randomBtn = document.querySelector("#random-btn");
 const pokemonModal = document.querySelector("#pokemon-modal");
 const modalContent = document.querySelector("#modal-pokemon-details");
 const closeModal = document.querySelector("#close-modal");
+
 const BASE_URL = "https://pokeapi.co/api/v2/pokemon/";
 const POKEMON_PER_PAGE = 21;
 let currentPage = 1;
@@ -98,22 +101,92 @@ function displayPokemon(poke) {
     });
 }
 
-function showModal(pokemon) {
-    const types = pokemon.types.map(type => `<p class="modal-type ${type.type.name}">${type.type.name}</p>`).join('');
+
+async function showModal(pokemon) {
+    const typeIcons = {
+        fire: 'fa-fire',
+        water: 'fa-tint',
+        grass: 'fa-leaf',
+        electric: 'fa-bolt',
+        psychic: 'fa-brain',
+        ice: 'fa-snowflake',
+        dragon: 'fa-dragon',
+        dark: 'fa-moon',
+        fairy: 'fa-star',
+        fighting: 'fa-fist-raised',
+        flying: 'fa-plane',
+        poison: 'fa-skull-crossbones',
+        ground: 'fa-mountain',
+        rock: 'fa-cave',
+        bug: 'fa-bug',
+        ghost: 'fa-ghost',
+        steel: 'fa-tools',
+        normal: 'fa-circle'
+    };
+
+    const types = pokemon.types.map(type => `
+        <i class="fas ${typeIcons[type.type.name]} type-icon"></i>
+    `).join('');
     const pokeId = pokemon.id.toString().padStart(3, '0');
+    const primaryType = pokemon.types[0].type.name;
+
+    // Cambiar color de fondo del modal según el tipo de Pokémon
+    document.querySelector('.modal-content').style.backgroundColor = `var(--type-${primaryType})`;
+
+    // Obtener evoluciones
+    const speciesResponse = await fetch(pokemon.species.url);
+    const speciesData = await speciesResponse.json();
+    const evolutionChainUrl = speciesData.evolution_chain.url;
+    const evolutionResponse = await fetch(evolutionChainUrl);
+    const evolutionData = await evolutionResponse.json();
+    const evolutions = getEvolutions(evolutionData.chain);
+
+
+    const evolutionHTML = evolutions.map((evo, index) => `
+        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${evo.id}.png" alt="${evo.name}">
+        ${index < evolutions.length - 1 ? `<span class="evolution-arrow arrow-${primaryType}">»</span>` : ''}
+    `).join('');
+
+    // Mostrar stats con barras de porcentaje
+    const statsHTML = pokemon.stats.map(stat => `
+        <div class="stat-bar">
+            <span class="${stat.stat.name.toLowerCase().replace(' ', '-')} stat-value" style="width: ${stat.base_stat}%;">
+                ${stat.stat.name}: ${stat.base_stat}
+            </span>
+        </div>
+    `).join('');
 
     modalContent.innerHTML = `
+    <header class="modal-header"> 
         <h2>${pokemon.name} (#${pokeId})</h2>
         <div class="modal-image">
             <img src="${pokemon.sprites.other["official-artwork"].front_default}" alt="${pokemon.name}">
         </div>
+    </header>
         <div class="modal-info">
             <p>Height: ${pokemon.height / 10} m</p>
             <p>Weight: ${pokemon.weight / 10} kg</p>
             <p>Types: ${types}</p>
+            <div class="evolution-container">${evolutionHTML}</div>
+            <div class="stats-container">${statsHTML}</div>
         </div>
     `;
     pokemonModal.style.display = "block";
+}
+
+// Obtener las evoluciones de forma recursiva
+function getEvolutions(chain, evolutions = []) {
+    evolutions.push({ id: extractIdFromUrl(chain.species.url), name: chain.species.name });
+    if (chain.evolves_to.length > 0) {
+        chain.evolves_to.forEach(evo => getEvolutions(evo, evolutions));
+    }
+    return evolutions;
+}
+
+// Extraer el ID de la URL de la especie
+function extractIdFromUrl(url) {
+    const idMatch = url.match(/\/(\d+)\/$/);
+    return idMatch ? idMatch[1] : null;
 }
 
 function closeModalWindow() {
@@ -122,6 +195,7 @@ function closeModalWindow() {
 
 async function loadPokemons(type = "all", page = 1) {
     pokemonList.innerHTML = ''; 
+    searchInput.value = ''; 
     currentPage = page;
     currentType = type;
     
@@ -176,6 +250,7 @@ function setupButtons() {
     headerButtons.forEach(button => {
         button.addEventListener("click", (e) => {
             const type = e.target.id;
+            
             if (type === "see-all") {
                 loadPokemons("all");
             } else if (type) {

@@ -7,6 +7,8 @@
     <title>Pokemon App</title>
     <link rel="icon" href="ball.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -21,7 +23,7 @@
 
 
     <div class="search-container">
-        <input type="text" id="pokemon-search" placeholder="Enter Pokémon name">
+        <input type="text" id="pokemon-search" placeholder="Enter Pokémon name or ID">
         <button class="btn-search" id="search-btn">
             <i class="fas fa-search"></i>
         </button>
@@ -35,17 +37,22 @@
 <!--     
     FALTA
     1. Filtro busqueda por nombre
-    - limpiar nombre cuando se aplican filtros
-    - ir buscando mientras escribo
+    - ir buscando mientras escribo (o que si se escribe 3 letras retorne todos los pokemones que tengan esas 3 letras)
     - pop up cuando no se encuentra  
     
-    2. Filtro por tipo
-    - Pop Up con info 
-        (id, elemento, foto, peso, altutra, evolucion, estadistica, movimientos, )
+    2. Diseño
     - Prev y Next (disabilitar)
+    - cuando id tiene mas de 4 digitos disminuir tamaño
+    - degradado color tarjetas cuando tienen 2 tipos
 
+    -diseño modal
+
+    3. filtros
     -filtro con peso
     -Altura
+
+    4. responsive
+    -lista de filtros
     
     -->
     <div class="line"> </div>
@@ -121,9 +128,16 @@
         <div id="pokemon-modal" class="pokemon-modal">
             <div class="modal-content">
                 <span id="close-modal" class="close">&times;</span>
-                <div id="modal-pokemon-details"></div>
+                <div id="modal-pokemon-details">
+                    <h2 id="pokemon-name"></h2>
+                    <div id="pokemon-info">
+                        <div id="pokemon-evolution" class="evolution-container"></div>
+                        <div id="pokemon-stats" class="stats-container"></div>
+                    </div>
+                </div>
             </div>
         </div>
+        
 
 
         <div class="pagination">
