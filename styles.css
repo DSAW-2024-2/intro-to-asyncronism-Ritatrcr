@@ -51,6 +51,7 @@ header {
 
 h2{
     text-transform: uppercase;
+    margin-bottom: 20px;
 }
 
 
@@ -97,6 +98,26 @@ h2{
     box-shadow: 0 0 1rem var(--clr-shadow-light);
 }
 
+.alert {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px;
+    margin: 0;
+    border-radius: 5px;
+    color: #fff;
+    background-color: #f44336; /* Rojo para indicar error */
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    z-index: 1000; /* Asegura que esté encima de otros contenidos */
+    width: auto;
+    max-width: 90%;
+}
+
+
+
 .btn-search {
     padding: 0px;
     margin-left: 10px;
@@ -131,7 +152,6 @@ h2{
     width: 80%;
     margin: 30px;
     align-items: center;
-    justify-content: space-around;
     flex-wrap: wrap;
     gap: .5rem;
 }
@@ -346,46 +366,55 @@ main {
 .pokemon-modal {
     display: none; 
     position: fixed;
-    margin-top: 30px;
     z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     overflow: hidden; 
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.849);
+
+
 }
 
 .modal-content {
     background-color: #fefefe;
     margin: auto;
     padding: 20px;
-    border: 1px solid #888;
     width: 90%;
     max-width: 900px;
     border-radius: 8px;
     overflow-y: auto;
-    max-height: 80vh; 
-    background-color: rgba(0, 0, 0, 0.5);
-
-    box-shadow: 0px 0px 30px var(--clr-border-dark);
+    max-height: 90vh; 
+    
 }
-.modal-header{
+.modal-header {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    direction: column;
+    margin-bottom: 10px;
+    background-color: transparent;
+    text-align: center; 
 }
 
-.modal-image{
+.modal-info{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-image {
     display: flex;
     justify-content: center;
-    width: 200px;
-    height: 200px;
+    margin-bottom: 10px; 
+    width: 170px;
+    height: 170px;
 }
 
+
 .close {
-    color: #aaa;
+    color: #433e3e;
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -400,15 +429,7 @@ main {
 
 .evolution-container {
     display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
-}
-
-
-.evolution-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
+    justify-content: center;
     margin-top: 20px;
 }
 
@@ -428,66 +449,60 @@ main {
 
 .evolution-arrow {
     font-size: 80px;
-    background: linear-gradient(to right, orange, red);
+    background: linear-gradient(to right, red, orange);
     background-size: 200% 100%; /* Asegura que el gradiente tenga suficiente tamaño para moverse */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: gradientMove 5s linear infinite; /* Cambia la duración según tus preferencias */
+    animation: gradientMove 3s linear infinite; /* Cambia la duración según tus preferencias */
     margin: 0 10px;
 }
 
-
-
-
 .stats-container {
-    margin-top: 20px;
+    margin-top: 1em;
 }
 
 .stat-bar {
-    background-color: #fefefe4c;
+    position: relative;
+    background: #f0f0f047;
     border-radius: 5px;
+    height: 25px;
+    margin-bottom: 12px;
     overflow: hidden;
-    margin-bottom: 10px;
 }
 
-.stat-bar span {
-    display: block;
-    height: 20px;
-    text-align: right;
-    padding-right: 5px;
-    line-height: 20px;
-    border-radius: 5px;
-    color: #373434;
-}
-
-.stat-bar span::first-letter {
-    text-transform: uppercase; /* Asegura que la primera letra esté en mayúscula */
-}
-
-
-.stat-bar .hp { background-color: var(--clr-white); }
-.stat-bar .attack { background-color: var(--clr-white); }
-.stat-bar .defense { background-color: var(--clr-white); }
-.stat-bar .special-attack { background-color: var(--clr-white); }
-.stat-bar .special-defense { background-color: var(--clr-white); }
-.stat-bar .speed { background-color: var(--clr-white); }
-
-
-.stats {
-    margin-top: 20px;
-}
-
-.stat-bar {
+.stat-bar .stat-value {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
-}
-
-.stat-name {
-    flex: 1;
+    height: 100%;
+    color: #fff;
+    padding-left: 10px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    transition: width 0.5s ease-in-out;
     text-transform: capitalize;
 }
+
+.stat-bar .stat-value::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 0;
+    border-radius: 5px;
+}
+
+.stat-bar .stat-value {
+    z-index: 1;
+    background: linear-gradient(90deg, rgba(255, 99, 132, 1) 0%, rgba(255, 159, 64, 1) 100%);
+}
+
+
+
 
 .progress {
     flex: 3;

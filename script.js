@@ -131,7 +131,7 @@ async function showModal(pokemon) {
     const primaryType = pokemon.types[0].type.name;
 
     // Cambiar color de fondo del modal según el tipo de Pokémon
-    document.querySelector('.modal-content').style.backgroundColor = `var(--type-${primaryType})`;
+    document.querySelector('.modal-content').style.background = `linear-gradient(180deg, var(--type-${primaryType}), rgba(0, 0, 0) 200%)`;
 
     // Obtener evoluciones
     const speciesResponse = await fetch(pokemon.species.url);
@@ -141,6 +141,9 @@ async function showModal(pokemon) {
     const evolutionData = await evolutionResponse.json();
     const evolutions = getEvolutions(evolutionData.chain);
 
+    pokemonModal.style.display = 'flex';
+
+    
 
     const evolutionHTML = evolutions.map((evo, index) => `
         <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${evo.id}.png" alt="${evo.name}">
@@ -148,28 +151,33 @@ async function showModal(pokemon) {
     `).join('');
 
     // Mostrar stats con barras de porcentaje
+    // pon el color del pokemon en las barras
     const statsHTML = pokemon.stats.map(stat => `
         <div class="stat-bar">
-            <span class="${stat.stat.name.toLowerCase().replace(' ', '-')} stat-value" style="width: ${stat.base_stat}%;">
-                ${stat.stat.name}: ${stat.base_stat}
+            <span class="${stat.stat.name.replace(' ', '-')} stat-value" style="width: ${stat.base_stat}%;">
+                ${stat.stat.name}: ${stat.base_stat}%
             </span>
         </div>
     `).join('');
 
     modalContent.innerHTML = `
-    <header class="modal-header"> 
-        <h2>${pokemon.name} (#${pokeId})</h2>
+    <div class="modal-header"> 
+        <div class="modal-info"> 
+            <h2>${pokemon.name} (#${pokeId})</h2>
+            <p>Height: ${pokemon.height / 10} m</p>
+                <p>Weight: ${pokemon.weight / 10} kg</p>
+                <p>Types: ${types}</p>
+        </div>
         <div class="modal-image">
             <img src="${pokemon.sprites.other["official-artwork"].front_default}" alt="${pokemon.name}">
         </div>
-    </header>
-        <div class="modal-info">
-            <p>Height: ${pokemon.height / 10} m</p>
-            <p>Weight: ${pokemon.weight / 10} kg</p>
-            <p>Types: ${types}</p>
+    </div>
+   
+        <div>
             <div class="evolution-container">${evolutionHTML}</div>
             <div class="stats-container">${statsHTML}</div>
         </div>
+   
     `;
     pokemonModal.style.display = "block";
 }
@@ -216,7 +224,22 @@ async function searchPokemon(name) {
         const pokemon = await fetchPokemon(name.toLowerCase());
         displayPokemon(pokemon);
     } catch (error) {
-        pokemonList.innerHTML = `<p>Pokémon not found.</p>`;
+        // Eliminar cualquier aviso previo
+        const existingAlert = document.querySelector('.alert');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+    
+        // Crear y mostrar el nuevo aviso
+        const alert = document.createElement('div');
+        alert.className = 'alert';
+        alert.textContent = 'Pokémon not found.';
+        document.body.appendChild(alert);
+    
+        // Opcional: Ocultar el aviso después de unos segundos
+        setTimeout(() => {
+            alert.remove();
+        }, 2000); // El aviso se ocultará después de 3 segundos
     }
 }
 
