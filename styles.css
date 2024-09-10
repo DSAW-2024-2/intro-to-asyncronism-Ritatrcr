@@ -57,10 +57,15 @@ h2{
 
 .title {
     text-align: center;
-    font-size: 2rem;
+
     .image {
         max-width: 400px;
         width: 100%;
+    }
+}
+@media (max-width: 768px) {
+    .title .image {
+        max-width: 300px; 
     }
 }
 
@@ -135,27 +140,8 @@ h2{
 }
 
 
-.nav {
-    
-    padding: 1rem;
-    max-width: 100%;
-    border-radius: 100vmax;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
 
-}
-
-.nav-list {
-    display: flex;
-    width: 80%;
-    margin: 30px;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: .5rem;
-}
-
+/* Estilos para los botones */
 .btn {
     border: none;
     padding: 4px 27px;
@@ -165,7 +151,112 @@ h2{
     box-shadow: 0 0 0.2rem var(--clr-shadow-light);
     color: var(--clr-border-dark);
     background-color: var(--clr-background-yellow);
+    transition: all 0.3s ease-in-out;
 }
+
+/* Botones circulares para pantallas pequeñas */
+/* Mostrar iconos y ocultar texto en pantallas pequeñas */
+@media (max-width: 768px) {
+    .btn {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        text-align: center;
+    }
+
+    .btn span {
+        display: none; 
+    }
+
+    .btn i {
+        display: inline-block; 
+    }
+}
+
+
+
+.nav {
+    padding: 1rem;
+    max-width: 100%;
+    border-radius: 100vmax;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.nav-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 1rem;
+}
+
+/* Pantallas pequeñas - Ocultar la lista de navegación hasta que el toggle esté activo */
+@media (max-width: 768px) {
+    .nav-list {
+        display: none;
+        flex-direction: row;
+        width: 100%;
+        align-items: center;
+    }
+
+    .nav-toggle {
+        display: block;
+        cursor: pointer;
+        background-color: var(--clr-background-yellow);
+        color: var(--clr-border-dark);
+        padding: 10px 20px;
+        border: none;
+        border-radius: 20px;
+        font-weight: 700;
+        box-shadow: 0 0 0.3rem var(--clr-background-yellow);
+        margin-bottom: 10px;
+        position: relative;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .nav-toggle::after {
+        content: "\25BC"; /* Flecha hacia abajo */
+        display: inline-block;
+        margin-left: 10px;
+    }
+
+    /* Cambia la flecha cuando el nav está activo */
+    .nav-toggle.active::after {
+        content: "\25B2"; /* Flecha hacia arriba */
+    }
+
+    /* Mostrar la lista de navegación cuando el toggle esté activo */
+    .nav-toggle.active + .nav-list {
+        display: flex;
+    }
+}
+
+/* Pantallas grandes */
+@media (min-width: 769px) {
+    .nav-toggle {
+        display: none;
+    }
+
+    .nav-list {
+        display: flex;
+        flex-direction: row;
+    }
+}
+
+
+
+
 
 .normal {
     background-color: var(--type-normal);
@@ -247,10 +338,12 @@ h2{
 
 main {
     padding: 2rem;
-    max-width: 1000px;
-    margin: 0 auto;
+    width: 100%; /* Ocupa todo el ancho de la pantalla */
+    height: 100vh; /* Ocupa toda la altura de la pantalla */
     background-color: var(--clr-dark-gray);
+    box-sizing: border-box; /* Incluye el padding en el ancho total */
 }
+
 
 .all-pokemons {
     display: grid;
@@ -258,13 +351,13 @@ main {
     gap: 1rem;
 }
 
-@media screen and (min-width: 470px) {
+@media screen and (min-width: 640px) {
     .all-pokemons {
         grid-template-columns: 1fr 1fr;
     }
 }
 
-@media screen and (min-width: 700px) {
+@media screen and (min-width: 946px) {
     .all-pokemons {
         grid-template-columns: 1fr 1fr 1fr;
     }
@@ -279,8 +372,9 @@ main {
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    margin: 9px;
+    margin: 13px;
 }
+
 
 .pokemon:hover {
     transform: scale(1.1);
@@ -288,12 +382,13 @@ main {
     cursor:pointer;
 }
 
+
 .pokemon-id-back {
     position: absolute;
-    top: 2rem;
+    top: 3rem;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 6.7rem;
+    font-size: 7.7rem;
     font-weight: 900;
     z-index: -1;
     color: #1c1c1c88;
@@ -341,7 +436,6 @@ main {
     gap: .5rem;
     font-size: .75rem;
     font-weight: 500;
-    flex-wrap: wrap;
     justify-content: center;
 }
 
@@ -388,6 +482,7 @@ main {
     max-height: 90vh; 
     
 }
+
 .modal-header {
     display: flex;
     justify-content: center;
@@ -529,7 +624,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 20px 0;
+    margin: 20px 10px;
 }
 
 .pagination button {
@@ -567,4 +662,25 @@ main {
 .pagination button:focus {
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
 }
+
+.btn-shiny {
+    background-color: #f5ba13;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-shiny:hover {
+    background-color: #e09e0b;
+}
+
+
+
+
+
 

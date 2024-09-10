@@ -16,6 +16,9 @@ const POKEMON_PER_PAGE = 21;
 let currentPage = 1;
 let currentType = "all";
 
+
+
+
 async function fetchPokemon(id) {
     const response = await fetch(`${BASE_URL}${id}`);
     const data = await response.json();
@@ -53,6 +56,64 @@ async function getTotalPokemonCount() {
     }
 }
 
+
+async function loadPokemons(type = "all", page = 1) {
+    pokemonList.innerHTML = ''; 
+    searchInput.value = ''; 
+    currentPage = page;
+    currentType = type;
+    
+    let offset = (page - 1) * POKEMON_PER_PAGE;
+    let pokemons;
+
+    if (type === "all") {
+        pokemons = await fetchAllPokemons(offset);
+    } else {
+        pokemons = await fetchPokemonsByType(type, offset);
+    }
+
+    pokemons.forEach(displayPokemon);
+
+    // Actualizar el estado de los botones después de cargar los Pokémones
+    await updateButtonStates();
+}
+
+
+function debounce(func, delay) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+async function searchPokemon(name) {
+    pokemonList.innerHTML = ''; 
+    try {
+        const pokemon = await fetchPokemon(name.toLowerCase());
+        displayPokemon(pokemon);
+    } catch (error) {
+        // Eliminar cualquier aviso previo
+        const existingAlert = document.querySelector('.alert');
+        if (existingAlert) {
+            existingAlert.remove();
+        }
+    
+
+        const alert = document.createElement('div');
+        alert.className = 'alert';
+        alert.textContent = 'Pokémon not found.';
+        document.body.appendChild(alert);
+    
+     
+        setTimeout(() => {
+            alert.remove();
+        }, 2000); 
+    }
+}
+
+
+//Random 
 async function fetchRandomPokemon() {
     try {
         const totalPokemonCount = await getTotalPokemonCount();
@@ -62,6 +123,7 @@ async function fetchRandomPokemon() {
         console.error('Error fetching random Pokémon:', error);
     }
 }
+
 
 
 function displayPokemon(poke) {
@@ -94,15 +156,14 @@ function displayPokemon(poke) {
     `;
     pokemonList.append(div);
 
-
     div.addEventListener("click", async () => {
         const pokemonDetails = await fetchPokemon(poke.id);
         showModal(pokemonDetails);
     });
 }
 
-
 async function showModal(pokemon) {
+    // Icons
     const typeIcons = {
         fire: 'fa-fire',
         water: 'fa-tint',
@@ -117,7 +178,7 @@ async function showModal(pokemon) {
         flying: 'fa-plane',
         poison: 'fa-skull-crossbones',
         ground: 'fa-mountain',
-        rock: 'fa-cave',
+        rock: 'fa-gem',
         bug: 'fa-bug',
         ghost: 'fa-ghost',
         steel: 'fa-tools',
@@ -127,126 +188,132 @@ async function showModal(pokemon) {
     const types = pokemon.types.map(type => `
         <i class="fas ${typeIcons[type.type.name]} type-icon"></i>
     `).join('');
+    
     const pokeId = pokemon.id.toString().padStart(3, '0');
     const primaryType = pokemon.types[0].type.name;
 
-    // Cambiar color de fondo del modal según el tipo de Pokémon
+    // Change modal background color based on Pokémon's primary type
     document.querySelector('.modal-content').style.background = `linear-gradient(180deg, var(--type-${primaryType}), rgba(0, 0, 0) 200%)`;
 
-    // Obtener evoluciones
+    // Get species and evolution chain
     const speciesResponse = await fetch(pokemon.species.url);
     const speciesData = await speciesResponse.json();
     const evolutionChainUrl = speciesData.evolution_chain.url;
     const evolutionResponse = await fetch(evolutionChainUrl);
     const evolutionData = await evolutionResponse.json();
-    const evolutions = getEvolutions(evolutionData.chain);
-
-    pokemonModal.style.display = 'flex';
-
     
+    // Get all evolutions from the chain, including their image URLs
+    const evolutions = await getEvolutions(evolutionData.chain);
 
+    // Build the HTML 
     const evolutionHTML = evolutions.map((evo, index) => `
-        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${evo.id}.png" alt="${evo.name}">
+        <img src="${evo.image}" alt="${evo.name}">
         ${index < evolutions.length - 1 ? `<span class="evolution-arrow arrow-${primaryType}">»</span>` : ''}
     `).join('');
 
-    // Mostrar stats con barras de porcentaje
-    // pon el color del pokemon en las barras
+    // Stats with bars
     const statsHTML = pokemon.stats.map(stat => `
         <div class="stat-bar">
-            <span class="${stat.stat.name.replace(' ', '-')} stat-value" style="width: ${stat.base_stat}%;">
+            <span class="${stat.stat.name.replace(' ', '-')} stat-value" style="width: ${stat.base_stat}%; background-color: var(--type-${primaryType});">
                 ${stat.stat.name}: ${stat.base_stat}%
             </span>
         </div>
     `).join('');
 
     modalContent.innerHTML = `
-    <div class="modal-header"> 
-        <div class="modal-info"> 
-            <h2>${pokemon.name} (#${pokeId})</h2>
-            <p>Height: ${pokemon.height / 10} m</p>
+        <div class="modal-header"> 
+            <div class="modal-info"> 
+                <h2>${pokemon.name} (#${pokeId})</h2>
+                <p>Height: ${pokemon.height / 10} m</p>
                 <p>Weight: ${pokemon.weight / 10} kg</p>
                 <p>Types: ${types}</p>
+            </div>
+            <div class="modal-image">
+                <img id="pokemon-image" src="${pokemon.sprites.other["official-artwork"].front_default}" alt="${pokemon.name}">
+            </div>
         </div>
-        <div class="modal-image">
-            <img src="${pokemon.sprites.other["official-artwork"].front_default}" alt="${pokemon.name}">
-        </div>
-    </div>
-   
+        <button id="toggle-shiny-btn" class="btn-shiny">Show Shiny</button>
         <div>
             <div class="evolution-container">${evolutionHTML}</div>
             <div class="stats-container">${statsHTML}</div>
         </div>
-   
     `;
+
     pokemonModal.style.display = "block";
+
+    const toggleShinyBtn = document.querySelector("#toggle-shiny-btn");
+    const pokemonImage = document.querySelector("#pokemon-image");
+    let isShiny = false;
+
+    toggleShinyBtn.addEventListener("click", () => {
+        if (!isShiny) {
+            pokemonImage.src = pokemon.sprites.other["official-artwork"].front_shiny;
+            toggleShinyBtn.textContent = "Show Normal";
+        } else {
+            pokemonImage.src = pokemon.sprites.other["official-artwork"].front_default;
+            toggleShinyBtn.textContent = "Show Shiny";
+        }
+        isShiny = !isShiny;
+    });
 }
 
-// Obtener las evoluciones de forma recursiva
-function getEvolutions(chain, evolutions = []) {
-    evolutions.push({ id: extractIdFromUrl(chain.species.url), name: chain.species.name });
-    if (chain.evolves_to.length > 0) {
-        chain.evolves_to.forEach(evo => getEvolutions(evo, evolutions));
+
+
+async function getEvolutions(chain) {
+    let evolutions = [];
+    let currentStage = chain;
+
+    while (currentStage) {
+        // Fetch data for the current Pokémon in the evolution chain
+        const pokemonResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${currentStage.species.name}`);
+        const pokemonData = await pokemonResponse.json();
+
+        evolutions.push({
+            id: pokemonData.id,
+            name: pokemonData.name,
+            image: pokemonData.sprites.other["official-artwork"].front_default
+        });
+
+        // Move to the next evolution
+        currentStage = currentStage.evolves_to.length ? currentStage.evolves_to[0] : null;
     }
-    return evolutions;
-}
 
-// Extraer el ID de la URL de la especie
-function extractIdFromUrl(url) {
-    const idMatch = url.match(/\/(\d+)\/$/);
-    return idMatch ? idMatch[1] : null;
+    return evolutions;
 }
 
 function closeModalWindow() {
     pokemonModal.style.display = "none";
 }
 
-async function loadPokemons(type = "all", page = 1) {
-    pokemonList.innerHTML = ''; 
-    searchInput.value = ''; 
-    currentPage = page;
-    currentType = type;
-    
-    let offset = (page - 1) * POKEMON_PER_PAGE;
-    let pokemons;
+async function updateButtonStates() {
+    const totalPokemons = await getTotalPokemonCount();
 
-    if (type === "all") {
-        pokemons = await fetchAllPokemons(offset);
+
+    if (currentPage === 1) {
+        prevBtn.disabled = true;
     } else {
-        pokemons = await fetchPokemonsByType(type, offset);
+        prevBtn.disabled = false;
     }
-    pokemons.forEach(displayPokemon);
+
+    if (currentPage * POKEMON_PER_PAGE >= totalPokemons) {
+        nextBtn.disabled = true;
+    } else {
+        nextBtn.disabled = false;
+    }
+
+    if (totalPokemons <= POKEMON_PER_PAGE) {
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+    }
 }
 
-async function searchPokemon(name) {
-    pokemonList.innerHTML = ''; 
-    try {
-        const pokemon = await fetchPokemon(name.toLowerCase());
-        displayPokemon(pokemon);
-    } catch (error) {
-        // Eliminar cualquier aviso previo
-        const existingAlert = document.querySelector('.alert');
-        if (existingAlert) {
-            existingAlert.remove();
-        }
-    
-        // Crear y mostrar el nuevo aviso
-        const alert = document.createElement('div');
-        alert.className = 'alert';
-        alert.textContent = 'Pokémon not found.';
-        document.body.appendChild(alert);
-    
-        // Opcional: Ocultar el aviso después de unos segundos
-        setTimeout(() => {
-            alert.remove();
-        }, 2000); // El aviso se ocultará después de 3 segundos
-    }
-}
+
 
 function setupButtons() {
     prevBtn.addEventListener("click", () => {
         if (currentPage > 1) {
             loadPokemons(currentType, currentPage - 1);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
 
@@ -264,20 +331,22 @@ function setupButtons() {
             const pokemons = await fetchPokemonsByType(currentType, offset);
             hasMorePokemons = pokemons.length > 0;
         }
-        
+
         if (hasMorePokemons) {
             loadPokemons(currentType, currentPage + 1);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
+    
 
     headerButtons.forEach(button => {
         button.addEventListener("click", (e) => {
-            const type = e.target.id;
-            
+            const type = e.target.id;            
             if (type === "see-all") {
                 loadPokemons("all");
             } else if (type) {
                 loadPokemons(type);
+                console.log('gff')
             }
         });
     });
@@ -285,12 +354,16 @@ function setupButtons() {
     searchBtn.addEventListener("click", () => {
         const searchTerm = searchInput.value.trim();
         if (searchTerm) {
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
             searchPokemon(searchTerm);
         }
     });
 
     searchInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
             searchBtn.click();
         }
     });
@@ -298,6 +371,8 @@ function setupButtons() {
     randomBtn.addEventListener("click", async () => {
         const pokemon = await fetchRandomPokemon();
         pokemonList.innerHTML = ''; 
+        searchInput.value = ''; 
+        nextBtn.disabled = true;
         displayPokemon(pokemon);
     });
 
@@ -311,5 +386,28 @@ function setupButtons() {
 }
 
 
+
+// Manejar el clic en el botón de toggle
+document.querySelector('.nav-toggle').addEventListener('click', function() {
+    this.classList.toggle('active');
+    document.querySelector('.nav-list').classList.toggle('active');
+});
+
+document.querySelectorAll('.nav-list .btn').forEach(button => {
+    button.addEventListener('click', function() {
+        document.querySelector('.nav-toggle').classList.remove('active');
+        document.querySelector('.nav-list').classList.remove('active');
+    });
+});
+
+
+
+
+
 setupButtons();
 loadPokemons();
+
+
+
+
+
