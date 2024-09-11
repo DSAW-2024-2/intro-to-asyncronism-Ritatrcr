@@ -215,7 +215,7 @@ async function showModal(pokemon) {
     const statsHTML = pokemon.stats.map(stat => `
         <div class="stat-bar">
             <span class="${stat.stat.name.replace(' ', '-')} stat-value" style="width: ${stat.base_stat}%; background-color: var(--type-${primaryType});">
-                ${stat.stat.name}: ${stat.base_stat}%
+                ${stat.stat.name}: ${stat.base_stat}
             </span>
         </div>
     `).join('');
@@ -231,30 +231,39 @@ async function showModal(pokemon) {
             <div class="modal-image">
                 <img id="pokemon-image" src="${pokemon.sprites.other["official-artwork"].front_default}" alt="${pokemon.name}">
             </div>
+            <button id="toggle-shiny-btn" class="btn-shiny"><i class="fa-regular fa-star"></i></button>
         </div>
-        <button id="toggle-shiny-btn" class="btn-shiny">Show Shiny</button>
-        <div>
+        
+        <div class='modal-evolution-container'>
+            <h3 class='modal-evolution'>Evolution Chain</h3>
+        </div>
             <div class="evolution-container">${evolutionHTML}</div>
             <div class="stats-container">${statsHTML}</div>
-        </div>
+
     `;
 
     pokemonModal.style.display = "block";
 
     const toggleShinyBtn = document.querySelector("#toggle-shiny-btn");
     const pokemonImage = document.querySelector("#pokemon-image");
-    let isShiny = false;
+    
+    const shinyIcon = '<i class="fa-regular fa-star"></i>'; 
+    const normalIcon = '<i class="fa-solid fa-star"></i>'; 
+    
+    let isShiny = false; 
+    
 
     toggleShinyBtn.addEventListener("click", () => {
         if (!isShiny) {
             pokemonImage.src = pokemon.sprites.other["official-artwork"].front_shiny;
-            toggleShinyBtn.textContent = "Show Normal";
+            toggleShinyBtn.innerHTML = `${normalIcon}`;
         } else {
             pokemonImage.src = pokemon.sprites.other["official-artwork"].front_default;
-            toggleShinyBtn.textContent = "Show Shiny";
+            toggleShinyBtn.innerHTML = `${shinyIcon} `;
         }
         isShiny = !isShiny;
     });
+    
 }
 
 
@@ -264,7 +273,6 @@ async function getEvolutions(chain) {
     let currentStage = chain;
 
     while (currentStage) {
-        // Fetch data for the current Pokémon in the evolution chain
         const pokemonResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${currentStage.species.name}`);
         const pokemonData = await pokemonResponse.json();
 
@@ -273,8 +281,6 @@ async function getEvolutions(chain) {
             name: pokemonData.name,
             image: pokemonData.sprites.other["official-artwork"].front_default
         });
-
-        // Move to the next evolution
         currentStage = currentStage.evolves_to.length ? currentStage.evolves_to[0] : null;
     }
 
@@ -346,7 +352,6 @@ function setupButtons() {
                 loadPokemons("all");
             } else if (type) {
                 loadPokemons(type);
-                console.log('gff')
             }
         });
     });
@@ -359,6 +364,8 @@ function setupButtons() {
             searchPokemon(searchTerm);
         }
     });
+
+
 
     searchInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {

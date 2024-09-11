@@ -400,12 +400,15 @@ main {
     height: auto;
     display: flex;
     justify-content: center;
+    z-index:1;
+
 }
 
 .pokemon-image img {
     width: 200px;
     height: 200px;
     transition: transform 0.7s ease-in-out;
+
 }
 
 
@@ -466,7 +469,7 @@ main {
     width: 100%;
     height: 100%;
     overflow: hidden; 
-    background-color: rgba(0, 0, 0, 0.849);
+    background-color: rgba(0, 0, 0, 0.949);
 
 
 }
@@ -474,8 +477,8 @@ main {
 .modal-content {
     background-color: #fefefe;
     margin: auto;
-    padding: 20px;
-    width: 90%;
+    padding: 30px;
+    width: 50%;
     max-width: 900px;
     border-radius: 8px;
     overflow-y: auto;
@@ -491,12 +494,18 @@ main {
     margin-bottom: 10px;
     background-color: transparent;
     text-align: center; 
+    
 }
 
 .modal-info{
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start; 
+    border-left: 4px solid #ccc; 
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    
 }
 
 .modal-image {
@@ -533,13 +542,16 @@ main {
     height: 80px;
 }
 
-@keyframes gradientMove {
-    0% {
-        background-position: 0% 0%;
-    }
-    100% {
-        background-position: 100% 0%;
-    }
+.modal-evolution{
+    font-size: 0.8em;
+    color: var(--clr-black);
+    margin-top: 20px;
+    
+}
+.modal-evolution-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .evolution-arrow {
@@ -554,7 +566,9 @@ main {
 }
 
 .stats-container {
-    margin-top: 1em;
+    margin-top: 1rem;
+    padding-left:30px ;
+    padding-right:30px ;
 }
 
 .stat-bar {
@@ -577,6 +591,7 @@ main {
     border-radius: 5px;
     transition: width 0.5s ease-in-out;
     text-transform: capitalize;
+
 }
 
 .stat-bar .stat-value::before {
@@ -664,20 +679,50 @@ main {
 }
 
 .btn-shiny {
-    background-color: #f5ba13;
+    background-color: transparent;
     border: none;
-    color: white;
-    padding: 10px 20px;
+    color: var(--clr-border-dark);
+    padding: 10px ;
     text-align: center;
     font-size: 16px;
-    border-radius: 5px;
+    border-radius: 100vmax;
     cursor: pointer;
     margin-top: 10px;
+    box-shadow: 0 0 0.5rem var(--clr-border-dark);
 }
 
 .btn-shiny:hover {
-    background-color: #e09e0b;
+    transform: scale(1.1);
+    box-shadow: 0 0 2rem rgba(0, 0, 0, .25);
 }
+
+/* .game-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background-color: transparent;
+    margin-top: 20px;
+}
+
+#pokemon-dino {
+    position: absolute;
+    bottom: 0;
+    width: 60px;
+    height: 60px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#cactus {
+    position: absolute;
+    bottom: 0;
+    left: 1000px;
+    width: 40px;
+    height: 60px;
+    background-color: rgb(0, 0, 0);
+} */
+
 
 
 
