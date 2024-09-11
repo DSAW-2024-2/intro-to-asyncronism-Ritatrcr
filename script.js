@@ -125,7 +125,6 @@ async function fetchRandomPokemon() {
 }
 
 
-
 function displayPokemon(poke) {
     let types = poke.types.map(type => `<p class="${type.type.name} type">${type.type.name}</p>`).join('');
     let pokeId = poke.id.toString().padStart(3, '0');
@@ -192,26 +191,21 @@ async function showModal(pokemon) {
     const pokeId = pokemon.id.toString().padStart(3, '0');
     const primaryType = pokemon.types[0].type.name;
 
-    // Change modal background color based on Pokémon's primary type
-    document.querySelector('.modal-content').style.background = `linear-gradient(180deg, var(--type-${primaryType}), rgba(0, 0, 0) 200%)`;
+    document.querySelector('.modal-content').style.background = `linear-gradient(180deg, var(--type-${primaryType}), #000 200%)`;
 
-    // Get species and evolution chain
     const speciesResponse = await fetch(pokemon.species.url);
     const speciesData = await speciesResponse.json();
     const evolutionChainUrl = speciesData.evolution_chain.url;
     const evolutionResponse = await fetch(evolutionChainUrl);
     const evolutionData = await evolutionResponse.json();
     
-    // Get all evolutions from the chain, including their image URLs
     const evolutions = await getEvolutions(evolutionData.chain);
 
-    // Build the HTML 
     const evolutionHTML = evolutions.map((evo, index) => `
         <img src="${evo.image}" alt="${evo.name}">
         ${index < evolutions.length - 1 ? `<span class="evolution-arrow arrow-${primaryType}">»</span>` : ''}
     `).join('');
 
-    // Stats with bars
     const statsHTML = pokemon.stats.map(stat => `
         <div class="stat-bar">
             <span class="${stat.stat.name.replace(' ', '-')} stat-value" style="width: ${stat.base_stat}%; background-color: var(--type-${primaryType});">
@@ -237,10 +231,13 @@ async function showModal(pokemon) {
         <div class='modal-evolution-container'>
             <h3 class='modal-evolution'>Evolution Chain</h3>
         </div>
-            <div class="evolution-container">${evolutionHTML}</div>
-            <div class="stats-container">${statsHTML}</div>
+        <div class="evolution-container">${evolutionHTML}</div>
+        <div class="stats-container">${statsHTML}</div>
+
+        
 
     `;
+    
 
     pokemonModal.style.display = "block";
 
@@ -265,6 +262,8 @@ async function showModal(pokemon) {
     });
     
 }
+
+
 
 
 
@@ -406,6 +405,8 @@ document.querySelectorAll('.nav-list .btn').forEach(button => {
         document.querySelector('.nav-list').classList.remove('active');
     });
 });
+
+
 
 
 

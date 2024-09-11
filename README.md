@@ -1,3 +1,4 @@
+## Rita Trindade da Cruz
 # Pokédex con PokéAPI: https://dsaw-2024-2.github.io/intro-to-asyncronism-Ritatrcr/
 
 #### Aquí podrán encontrar los archivos que utilicé en este video.

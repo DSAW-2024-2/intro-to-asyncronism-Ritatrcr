@@ -112,11 +112,11 @@ h2{
     margin: 0;
     border-radius: 5px;
     color: #fff;
-    background-color: #f44336; /* Rojo para indicar error */
+    background-color: #f44336; 
     text-align: center;
     font-size: 16px;
     font-weight: bold;
-    z-index: 1000; /* Asegura que esté encima de otros contenidos */
+    z-index: 1000; 
     width: auto;
     max-width: 90%;
 }
@@ -141,7 +141,6 @@ h2{
 
 
 
-/* Estilos para los botones */
 .btn {
     border: none;
     padding: 4px 27px;
@@ -154,8 +153,6 @@ h2{
     transition: all 0.3s ease-in-out;
 }
 
-/* Botones circulares para pantallas pequeñas */
-/* Mostrar iconos y ocultar texto en pantallas pequeñas */
 @media (max-width: 768px) {
     .btn {
         width: 40px;
@@ -411,8 +408,6 @@ main {
 
 }
 
-
-
 .pokemon-info {
     display: flex;
     flex-direction: column;
@@ -459,7 +454,6 @@ main {
     padding: .25rem .5rem;
     border-radius: 100vmax;
 }
-
 .pokemon-modal {
     display: none; 
     position: fixed;
@@ -470,8 +464,6 @@ main {
     height: 100%;
     overflow: hidden; 
     background-color: rgba(0, 0, 0, 0.949);
-
-
 }
 
 .modal-content {
@@ -483,39 +475,81 @@ main {
     border-radius: 8px;
     overflow-y: auto;
     max-height: 90vh; 
-    
 }
 
 .modal-header {
     display: flex;
+    flex-direction: row; 
     justify-content: center;
     align-items: center;
-    direction: column;
     margin-bottom: 10px;
     background-color: transparent;
-    text-align: center; 
-    
+    text-align: center;
 }
 
-.modal-info{
+@media screen and (max-width: 640px) {
+    .modal-content {
+        width: 75%; /* Ajusta el ancho en pantallas pequeñas */
+        max-width: 600px; /* Limita el ancho máximo en pantallas pequeñas */
+        padding: 20px; /* Ajusta el padding */
+    }
+
+    .modal-header {
+        flex-direction: column; 
+    }
+
+    .modal-image {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .modal-image img {
+        max-width: 90%;
+        height: auto;
+    }
+
+    .evolution-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .evolution-container img {
+        width: 60px;
+        height: 60px;
+    }
+    .stat-bar .stat-value {
+        font-size: 0.7rem;
+    }
+}
+
+.modal-info {
     display: flex;
     flex-direction: column;
     align-items: flex-start; 
-    border-left: 4px solid #ccc; 
+    border-left: 4px solid #ccccccd5; 
     padding-left: 10px;
     padding-top: 10px;
     padding-bottom: 10px;
-    
 }
 
 .modal-image {
     display: flex;
     justify-content: center;
     margin-bottom: 10px; 
-    width: 170px;
+    width: 270px;
     height: 170px;
 }
 
+.modal-image img {
+    width: 100%; /* La imagen ocupará todo el ancho del contenedor */
+    height: auto; /* Mantendrá la proporción de la imagen */
+    max-width: 200px; /* Tamaño máximo para pantallas pequeñas */
+}
 
 .close {
     color: #433e3e;
@@ -542,13 +576,13 @@ main {
     height: 80px;
 }
 
-.modal-evolution{
+.modal-evolution {
     font-size: 0.8em;
     color: var(--clr-black);
     margin-top: 20px;
-    
 }
-.modal-evolution-container{
+
+.modal-evolution-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -557,18 +591,18 @@ main {
 .evolution-arrow {
     font-size: 80px;
     background: linear-gradient(to right, red, orange);
-    background-size: 200% 100%; /* Asegura que el gradiente tenga suficiente tamaño para moverse */
+    background-size: 200% 100%; 
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: gradientMove 3s linear infinite; /* Cambia la duración según tus preferencias */
+    animation: gradientMove 3s linear infinite;
     margin: 0 10px;
 }
 
 .stats-container {
     margin-top: 1rem;
-    padding-left:30px ;
-    padding-right:30px ;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 
 .stat-bar {
@@ -584,14 +618,11 @@ main {
     display: flex;
     align-items: center;
     height: 100%;
-    color: #fff;
     padding-left: 10px;
     font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     border-radius: 5px;
     transition: width 0.5s ease-in-out;
     text-transform: capitalize;
-
 }
 
 .stat-bar .stat-value::before {
@@ -607,32 +638,9 @@ main {
 }
 
 .stat-bar .stat-value {
-    z-index: 1;
-    background: linear-gradient(90deg, rgba(255, 99, 132, 1) 0%, rgba(255, 159, 64, 1) 100%);
+    z-index: 1;    
+    color: var(--clr-black);
 }
-
-
-
-
-.progress {
-    flex: 3;
-    background-color: #ddd;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.progress-bar {
-    background-color: #4caf50;
-    text-align: right;
-    padding-right: 5px;
-    color: white;
-    height: 100%;
-    line-height: 20px;
-    border-radius: 5px;
-    transition: width 0.3s ease-in-out;
-}
-
-
 
 
 .pagination {
