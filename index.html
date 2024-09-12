@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon App</title>
+    <link rel="icon" href="images/ball.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    
+
+    <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        
+        <header>
+            <nav class="title">
+                <img class="title image" src="images/pokedex.png" alt="Logo Pokédex">
+            </nav>
+        </header>
+        
+
+
+        <div class="search-container">
+            <input type="text" id="pokemon-search" placeholder="Enter Pokémon name or ID">
+            <button class="btn-search" id="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="btn-search" id="random-btn">
+                <i class="fas fa-random"></i>
+            </button>
+        </div>
+        
+        
+        <div class="line"> </div>
+
+        <nav class="nav">
+            <button class="nav-toggle" aria-label="Toggle Navigation">
+                <span class="arrow">Filter By Type</span> 
+            </button>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <button class="btn" id="see-all">
+                        <i class="fa fa-list" id="see-all"></i> 
+                        <span id="see-all">See All</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn normal" id="normal">
+                        <i class="fa fa-circle" id="normal"></i>
+                        <span id="normal">Normal</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn fire" id="fire">
+                        <i class="fa fa-fire" id="fire"></i>
+                        <span id="fire">Fire</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn water" id="water">
+                        <i class="fa fa-tint" id="water"></i>
+                        <span id="water">Water</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn grass" id="grass">
+                        <i class="fa fa-leaf" id="grass"></i>
+                        <span id="grass">Grass</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn electric" id="electric">
+                        <i class="fa fa-bolt" id="electric"></i>
+                        <span id="electric">Electric</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn ice" id="ice">
+                        <i class="fa fa-snowflake" id="ice"></i>
+                        <span id="ice">Ice</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn fighting" id="fighting">
+                        <i class="fa fa-fist-raised" id="fighting"></i>
+                        <span id="fighting">Fighting</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn poison" id="poison">
+                        <i class="fa fa-skull-crossbones" id="poison"></i>
+                        <span id="poison">Poison</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn ground" id="ground">
+                        <i class="fa fa-mountain" id="ground"></i>
+                        <span id="ground">Ground</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn flying" id="flying">
+                        <i class="fa fa-plane" id="flying"></i>
+                        <span id="flying">Flying</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn psychic" id="psychic">
+                        <i class="fa fa-brain" id="psychic"></i>
+                        <span id="psychic">Psychic</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn bug" id="bug">
+                        <i class="fa fa-bug" id="bug"></i>
+                        <span id="bug">Bug</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn rock" id="rock">
+                        <i class="fa fa-gem" id="rock"></i>
+                        <span id="rock">Rock</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn ghost" id="ghost">
+                        <i class="fa fa-ghost" id="ghost"></i>
+                        <span id="ghost">Ghost</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn dark" id="dark">
+                        <i class="fa fa-moon" id="dark"></i>
+                        <span id="dark">Dark</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn dragon" id="dragon">
+                        <i class="fa fa-dragon" id="dragon"></i>
+                        <span id="dragon">Dragon</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn steel" id="steel">
+                        <i class="fa fa-tools" id="steel"></i>
+                        <span id="steel">Steel</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="btn fairy" id="fairy">
+                        <i class="fa fa-star" id="fairy"></i>
+                        <span id="fairy">Fairy</span>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+
+        <main>
+            <div id="all">
+                <div class="all-pokemons" id="listPokemon">
+                </div>
+            </div>  
+
+            <div id="pokemon-modal" class="pokemon-modal">
+                <div class="modal-content">
+                    <span id="close-modal" class="close">&times;</span>
+                    <div id="modal-pokemon-details">
+                        <h2 id="pokemon-name"></h2>
+                        <div id="pokemon-info">
+                            <div id="pokemon-evolution" class="evolution-container"></div>
+                            <div id="pokemon-stats" class="stats-container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pagination">
+                <button id="prev-btn"><i class="fas fa-chevron-left"></i></button>
+                <button id="next-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </main>
+        <script src="script.js"></script>
+    </body>
+</html>
