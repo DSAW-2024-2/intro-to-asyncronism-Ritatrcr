@@ -74,7 +74,6 @@ async function loadPokemons(type = "all", page = 1) {
 
     pokemons.forEach(displayPokemon);
 
-    // Actualizar el estado de los botones después de cargar los Pokémones
     await updateButtonStates();
 }
 
@@ -93,7 +92,6 @@ async function searchPokemon(name) {
         const pokemon = await fetchPokemon(name.toLowerCase());
         displayPokemon(pokemon);
     } catch (error) {
-        // Eliminar cualquier aviso previo
         const existingAlert = document.querySelector('.alert');
         if (existingAlert) {
             existingAlert.remove();
@@ -392,8 +390,6 @@ function setupButtons() {
 }
 
 
-
-// Manejar el clic en el botón de toggle
 document.querySelector('.nav-toggle').addEventListener('click', function() {
     this.classList.toggle('active');
     document.querySelector('.nav-list').classList.toggle('active');
@@ -407,15 +403,5 @@ document.querySelectorAll('.nav-list .btn').forEach(button => {
 });
 
 
-
-
-
-
-
 setupButtons();
 loadPokemons();
-
-
-
-
-
